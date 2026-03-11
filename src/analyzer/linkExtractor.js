@@ -45,6 +45,15 @@ function extractLinks(html, sourceUrl, startUrl) {
             }
         }
 
+        // Filter out meaningless / noisy labels:
+        // - Single characters like "?" or "×"
+        // - HTML-like strings like "<script setup>"
+        // - Pure numbers like "1" or "22"
+        // - Pure punctuation/symbols
+        if (text.length <= 2 || /^<[^>]+>$/.test(text) || /^[\d]+$/.test(text) || /^[^\w\s]+$/.test(text)) {
+            text = 'Unknown Link';
+        }
+
         if (!isValidLink(href)) return;
 
         // Normalizing URL relative to source domain

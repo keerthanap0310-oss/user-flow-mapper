@@ -176,11 +176,18 @@ function buildFlow(cleanedData, startUrl) {
     return {
         nodes,
         edges,
-        globalNavigation: globalNavs.map(nav => ({
-            id: nav.target,
-            label: cleanLabel(nav.text) || 'Unknown Link',
-            type: 'global_nav'
-        }))
+        globalNavigation: globalNavs.map(nav => {
+            let label = cleanLabel(nav.text);
+            if (!label || label === 'Unknown Link' || label === 'Global Nav Item') {
+                // Determine a readable label from the URL if the text is missing or unknown
+                label = getReadableLabel(nav.target);
+            }
+            return {
+                id: nav.target,
+                label: label,
+                type: 'global_nav'
+            };
+        })
     };
 }
 

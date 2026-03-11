@@ -5,6 +5,11 @@ function normalizeUrl(rawUrl, baseUrl) {
         const urlObj = new URL(rawUrl, baseUrl);
         // Remove hash/fragment
         urlObj.hash = '';
+        // Remove trailing /index.html or /index.htm (canonical form)
+        urlObj.pathname = urlObj.pathname.replace(/\/index\.html?$/i, '');
+        // Remove trailing .html or .htm extension to unify URLs
+        // e.g. /guide/web-components.html and /guide/web-components become the same
+        urlObj.pathname = urlObj.pathname.replace(/\.html?$/i, '');
         // Normalize path (remove trailing slash if present on path)
         if (urlObj.pathname !== '/' && urlObj.pathname.endsWith('/')) {
             urlObj.pathname = urlObj.pathname.slice(0, -1);
