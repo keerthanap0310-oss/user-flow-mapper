@@ -1,6 +1,14 @@
 const { fetchPage, closeBrowser, getPostAuthUrl } = require('./fetcher');
 const { extractLinks } = require('../analyzer/linkExtractor');
 const logger = require('../utils/logger');
+const cheerio = require('cheerio');
+
+/**
+ * Polite delay between requests to avoid overwhelming target servers.
+ */
+function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
 
 async function crawl(config) {
     let { startUrl, maxDepth = 3, maxPages = 50 } = config;
@@ -10,6 +18,7 @@ async function crawl(config) {
     const discovered = new Set([startUrl]);
     const rawEdges = [];
     const crawledPages = [];
+    const pageTitles = new Map(); // URL -> page title
     let effectiveStartUrl = startUrl; // May be remapped after auth
 
     while (queue.length > 0 && visited.size < maxPages) {
@@ -27,6 +36,17 @@ async function crawl(config) {
         if (!html) {
             logger.warn(`Skipping missing content for ${url}`);
             continue;
+        }
+
+        // Extract <title> from the page for better node labels
+        try {
+            const $ = cheerio.load(html);
+            const title = $('title').first().text().trim();
+            if (title && title.length > 0) {
+                pageTitles.set(url, title);
+            }
+        } catch (e) {
+            // Title extraction is optional; ignore errors
         }
 
         // After the first page fetch, check if auth redirected us.
@@ -69,6 +89,11 @@ async function crawl(config) {
                 }
             }
         }
+
+        // Polite crawling: wait between requests to avoid overwhelming the server
+        if (queue.length > 0 && config.requestDelay > 0) {
+            await sleep(config.requestDelay);
+        }
     }
 
     // Ensure browser closes after crawling all pages
@@ -76,7 +101,7 @@ async function crawl(config) {
         await closeBrowser();
     }
 
-    return { crawledPages, rawEdges };
+    return { crawledPages, rawEdges, pageTitles };
 }
 
 module.exports = {

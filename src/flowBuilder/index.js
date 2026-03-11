@@ -1,6 +1,6 @@
 const { URL } = require('url');
 
-function buildFlow(cleanedData, startUrl) {
+function buildFlow(cleanedData, startUrl, pageTitles = new Map()) {
     const { uniqueEdges, globalNavs } = cleanedData;
 
     const nodesMap = new Map();
@@ -115,7 +115,26 @@ function buildFlow(cleanedData, startUrl) {
     }
 
     function getReadableLabel(url) {
-        // 1. Check if we have a label from the link text that discovered this page
+        // 1. Highest priority: use the <title> tag extracted during crawling
+        if (pageTitles.has(url)) {
+            const pageTitle = pageTitles.get(url);
+            // Many page titles include the site name (e.g. "Reactivity | Vue.js")
+            // Try to extract just the page-specific part
+            const separators = [' | ', ' - ', ' — ', ' · ', ' :: '];
+            for (const sep of separators) {
+                if (pageTitle.includes(sep)) {
+                    const parts = pageTitle.split(sep);
+                    // Use the longest meaningful part (usually the page-specific part)
+                    const bestPart = parts.reduce((a, b) => a.trim().length >= b.trim().length ? a : b);
+                    const cleaned = cleanLabel(bestPart.trim());
+                    if (cleaned && cleaned.length > 2) return cleaned;
+                }
+            }
+            const cleaned = cleanLabel(pageTitle);
+            if (cleaned && cleaned.length > 2) return cleaned;
+        }
+
+        // 2. Check if we have a label from the link text that discovered this page
         if (labelMap.has(url)) {
             const cleaned = cleanLabel(labelMap.get(url));
             // If cleaning wiped out the label, fall through to URL-based label
