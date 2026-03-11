@@ -1,0 +1,44 @@
+{
+    "info": {
+        "_postman_id": "713bc48b-3fd1-4c7a-aab4-0cfc1e7f1aa6",
+        "name": "User Flow Mapper API",
+        "description": "Collection for testing User Flow Mapper endpoints locally.",
+        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    },
+    "item": [
+        {
+            "name": "Start Crawl (with Authentication)",
+            "request": {
+                "method": "POST",
+                "header": [
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                    }
+                ],
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\n    \"startUrl\": \"https://example.com/dashboard\",\n    \"maxDepth\": 2,\n    \"maxPages\": 10,\n    \"useBrowser\": true,\n    \"auth\": {\n        \"loginUrl\": \"https://example.com/login\",\n        \"username\": \"testuser@example.com\",\n        \"password\": \"password123\"\n    }\n}",
+                    "options": {
+                        "raw": {
+                            "language": "json"
+                        }
+                    }
+                },
+                "url": {
+                    "raw": "http://localhost:3000/crawl",
+                    "protocol": "http",
+                    "host": [
+                        "localhost"
+                    ],
+                    "port": "3000",
+                    "path": [
+                        "crawl"
+                    ]
+                },
+                "description": "This endpoint initiates the crawler with optional browser and authentication support."
+            },
+            "response": []
+        }
+    ]
+}
