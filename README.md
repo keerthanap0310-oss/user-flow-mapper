@@ -1,6 +1,6 @@
 # Intelligent User Flow Mapper
 
-A smart web crawler service that analyzes a website or web application and produces a **user flow representation** of the system. Instead of producing raw link graphs, it intelligently identifies meaningful navigation paths and separates global navigation (headers, footers, menus) from the core user journey — outputting a clean JSON structure ready for rendering on a frontend canvas (React Flow, D3.js, etc.).
+A smart web crawler service that analyzes a website or web application and produces a        **user flow representation** of the system. Instead of producing raw link graphs, it intelligently identifies meaningful navigation paths and separates global navigation (headers, footers, menus) from the core user journey — outputting a clean JSON structure ready for rendering on a frontend canvas (React Flow, D3.js, etc.).
 
 ## Problem Solved
 
